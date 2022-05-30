@@ -1,18 +1,15 @@
-import re
-from datetime import datetime, date
-import time
-from phonenumbers import geocoder
-import phonenumbers
+from datetime import datetime
+import random
 
 
-class BankAccount:
-    def __init__(self, name, surname, year, gender, phone, bank_id):
-        self.name = name
-        self.surname = surname
-        self.year = year
-        self.gender = gender
-        self.phone = phone
-        self.bank_id = bank_id
+class Person:
+    def __init__(self, name: str, surname: str, year: str, gender: str, phone: str, bank_id: int):
+        self.name: str = name
+        self.surname: str = surname
+        self.year: str = year
+        self.gender: str = gender
+        self.phone: str = phone
+        self.bank_id: int = bank_id
 
         self.auth()
 
@@ -25,21 +22,75 @@ class BankAccount:
             print('Вам нет 18 лет и не можете получить доступ к нашим услугам')
 
     def credit(self):
-        locations = {"380": [27, "₴"], "48": [3.9, "zł"], "1": [1, '$'], "49": [0.88, '€']}
-        geo = re.search(': (.+?) ', str(phonenumbers.parse(self.phone, None))).groups()[0]
-        coefficient = locations[geo][0]
-        valuta = locations[geo][1]
+        locations = {"48": [3.9, "zł"], "49": [0.88, '€']}
+        geo = self.phone[:2]
+
+        coefficient: float = locations[geo][0]
+        valuta: str = locations[geo][1]
         money = coefficient * 1000
-        self.get_info(money, valuta)
+        info: str = self.get_info(money, valuta)
+        print(info)
 
-    def get_info(self, money, valuta):
-        print(f'{self.name} {self.surname}, вам доступен кредит {int(money)}{valuta}\n')
+    def get_info(self, money: float, valuta: str) -> str:
+        return f'{self.name} {self.surname}, вам доступен кредит {int(money)}{valuta}\n'
 
+    def __repr__(self):
+        return f'Person({self.name}, {self.gender})'
+
+
+class Generator:
+    def __init__(self):
+
+        self.names: dict = {
+            0: ["Samuel", "Jack", "Joseph", "Harry", "Alfie", "Jacob", "Thomas"],
+            1: ["Alana", "Alex", "Cynthia", "Scarlett", "Emma", "Jenna", "Gabriel"]
+        }
+        self.surnames: list = ["Smith", "Brown", "Young", "Lewis", "Davis", "Harris", "Walker"]
+        self.genders: list = ['male', 'female']
+        self.generator()
+
+    def generate_single(self):
+        gen: int = random.randint(0, 1)
+        return gen
+
+    def generate_phone(self):
+        phone = ""
+        location: dict = {"48": ["55", "32", "85"], "49": ["5237", "7166"]}
+        country = random.choice(list(location))
+        city: str = f"{random.choice(location[country])}"
+        phone += f"{country}{city}"
+        while len(phone) < 10:
+            phone += str(random.randint(0, 9))
+        return phone
+
+    def generator(self):
+        gender: str = self.genders[self.generate_single()]
+        name: str = random.choice(self.names[self.generate_single()])
+        surname: str = random.choice(self.surnames)
+        while True:
+            try:
+                self.year: str = f"{random.randint(1, 30)}/{random.randint(1, 12)}/{random.randint(1900, 2022)}"
+                check = (datetime.now() - datetime.strptime(self.year, '%d/%m/%Y')).days / 365.2425
+                break
+            except ValueError:
+                continue
+        phone = self.generate_phone()
+        id = random.randint(9999, 20000000)
+        return Person(name, surname, self.year, gender, phone, id)
+
+    def generate_1000(self) -> list:
+        plist = list()
+        for i in range(1000):
+            plist.append(self.generator())
+        return plist
+
+    def generate_10000(self) -> list:
+        plist = list()
+        [plist.append(self.generator()) for i in range(10000)]
+        return plist
 
 if __name__ == '__main__':
-    person1 = BankAccount('Vitya', 'Leviy', '12/08/2003', 'male', '+48573451360', 2374283)
-    person2 = BankAccount('Natasha', 'Britva', '12/08/1998', 'female', '+490984087694', 9823941)
-    person3 = BankAccount('Misha', 'Poker', '12/02/2003', 'male', '+380678245673', 1231234)
-    person4 = BankAccount('Kolya', 'Poker', '12/08/2005', 'male', '+380984087458', 2281337)
+    for i in range(100000):
+        g = Generator()
 
 
