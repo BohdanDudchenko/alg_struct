@@ -1,176 +1,103 @@
-from AbstractModule import AbstractStructure
+from AbstractLimitStructure import AbstractStack
+from AbstractLimitStructure import AbstractQueue
+from node import Node
 from main import Generator, Person
 
 
-class List(AbstractStructure):
-    __list: list = []
-    size = 0
+class Stack(AbstractStack):
+    __node = Node(None)
+    __head = __node
+    __cur_top = __head
 
-    def add(self, value: Person, index: int = None) -> bool:
-        if value is not None and index is None:
-            self.__list.append(value)
-            self.size = len(self.__list)
-            return True
-        elif value is not None and index in range(len(self.__list)):
-            self.__list.insert(index, value)
-            self.size = len(self.__list)
-            return True
-        else:
-            return False
+    def push(self, value: Person) -> bool:
+        head = self.__head
+        top = self.__head.n
+        new_el = Node(value)
+        head.n = new_el
+        new_el.n = top
+        self.__cur_top = head.n
 
-    def insert(self, value: Person, index: int) -> bool:
-        if index not in range(len(self.__list)):
-            return False
-        else:
-            self.__list[index] = value
-            return True
+        return True
 
-    def remove(self, value: Person) -> bool:
-        if value in self.__list:
-            self.__list.remove(value)
-            self.size = len(self.__list)
-            return True
-        else:
-            return False
-
-    def get_all(self) -> list:
-        return self.__list
-
-    def get(self, index: int) -> object:
-        if index in range(len(self.__list)):
-            return self.__list[index]
+    def pop(self) -> [Person, None]:
+        if self.__head.n is not None:
+            head = self.__head
+            top = head.n
+            new_top = top.n
+            head.n = new_top
+            self.__cur_top = new_top
+            return top.data
         else:
             return None
 
-    def find(self, value: Person) -> [int, None]:
-        if value in self.__list:
-            return self.__list.index(value)
+    def top(self) -> [Person, None]:
+        if self.__cur_top is not None:
+            return self.__cur_top.data
         else:
             return None
 
-    def __repr__(self):
-        return f"{self.__list}"
 
+class Queue(AbstractQueue):
+    __body = []
+    __size = 0
 
-class DynamiqueArray(AbstractStructure):
-    __array: list = [None]
-    __size: int = 1
-    length: int = 0
+    def enqueue(self, value: Person) -> bool:
+        self.__body.append(value)
+        self.__size += 1
+        return True
 
-    def __memory_check(self) -> bool:
-        if self.length == self.__size:
-            self.__size *= 2
-            new_array = [None] * self.__size
-            for key, el in enumerate(self.__array):
-                new_array[key] = el
-            self.__array = new_array
-            return True
-        else:
-            return False
-
-    def add(self, value: Person, index: int = None) -> bool:
-        self.__memory_check()
-        if index is None:
-            self.__array[self.length] = value
-            self.length += 1
-            return True
-        elif index in range(self.length):
-            pos = self.length - 1
-            while pos >= index:
-                self.__array[pos + 1] = self.__array[pos]
-                pos -= 1
-            self.__array[index] = value
-            self.length += 1
-            return True
-        else:
-            return False
-
-    def insert(self, value: Person, index: int) -> bool:
-        if index in range(self.length):
-            self.__array[index] = value
-            return True
-        else:
-            return False
-
-    def remove(self, value: Person) -> bool:
-        self.__memory_check()
-        if value in self.__array:
-            pos = 0
-            deletion = False
-            while pos < self.length:
-                if value == self.__array[pos]:
-                    deletion = True
-                if deletion is True:
-                    self.__array[pos] = self.__array[pos + 1]
-                pos += 1
-            self.length -= 1
-            return True
-        else:
-            return False
-
-    def get(self, index: int) -> object:
-        if index in range(self.length):
-            return self.__array[index]
+    def dequeue(self) -> [Person, None]:
+        if self.__size != 0:
+            value = self.__body[0]
+            self.__body.remove(value)
+            self.__size -= 1
+            return value
         else:
             return None
 
-    def get_all(self) -> list:
-        list = []
-        for num in range(self.length):
-            list.append(self.__array[num])
-        return list
-
-    def find(self, value) -> [int, None]:
-        if value in self.__array:
-            for pos in range(self.length):
-                if value == self.__array[pos]:
-                    return pos
+    def top(self) -> [Person, None]:
+        if self.__size != 0:
+            return self.__body[0]
         else:
             return None
 
-    def __repr__(self):
-        list = []
-        for num in range(self.length):
-            list.append(self.__array[num])
-        return f"{list}"
 
-
+s = Stack()
+q = Queue()
 g = Generator()
-our_list = List()
-d = DynamiqueArray()
 
-print("------ LIST ------")
+print("------------Stack------------")
+s.push(g.generate_single())
+s.push(g.generate_single())
+s.push(g.generate_single())
+s.push(g.generate_single())
+s.push(g.generate_single())
 
-our_list.add(g.generate_single())
-our_list.add(g.generate_single())
-our_list.add(g.generate_single())
-our_list.add(g.generate_single(), 0)
-our_list.add(g.generate_single(), 3)
-print(our_list.get_all())
+print(f"top : {s.top()}")
 
-print(our_list.insert(g.generate_single(), 0))
-print(our_list.get_all())
+print(s.pop())
+print(s.pop())
+print(s.pop())
+print(s.pop())
+print(s.pop())
+print(s.pop())
 
-print(our_list.remove(our_list.get(0)))
-print(our_list.remove(1))
-print(our_list.get_all())
+print(f"top : {s.top()}")
 
-print(our_list.find(our_list.get(2)))
+print("------------QUEUE------------")
+q.enqueue(g.generate_single())
+q.enqueue(g.generate_single())
+q.enqueue(g.generate_single())
+q.enqueue(g.generate_single())
+q.enqueue(g.generate_single())
 
-print("------ DMASSIVE ------")
+print(f"top : {q.top()}")
 
-d.add(g.generate_single())
-d.add(g.generate_single())
-d.add(g.generate_single())
-d.add(g.generate_single(), 0)
-d.add(g.generate_single(), 3)
-print(d.get_all())
+print(q.dequeue())
+print(q.dequeue())
+print(q.dequeue())
+print(q.dequeue())
+print(q.dequeue())
+print(q.dequeue())
 
-print(d.insert(g.generate_single(), 0))
-print(d.get_all())
-
-print(d.remove(d.get(0)))
-print(d.remove(1))
-print(d.get_all())
-
-print(d.find(d.get(2)))
+print(f"top : {q.top()}")
