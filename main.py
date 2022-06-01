@@ -10,7 +10,6 @@ class Person:
         self.gender: str = gender
         self.phone: str = phone
         self.bank_id: int = bank_id
-
         self.auth()
 
     def auth(self):
@@ -40,18 +39,29 @@ class Person:
 
 class Generator:
     def __init__(self):
-
         self.names: dict = {
             0: ["Samuel", "Jack", "Joseph", "Harry", "Alfie", "Jacob", "Thomas"],
             1: ["Alana", "Alex", "Cynthia", "Scarlett", "Emma", "Jenna", "Gabriel"]
         }
         self.surnames: list = ["Smith", "Brown", "Young", "Lewis", "Davis", "Harris", "Walker"]
         self.genders: list = ['male', 'female']
-        self.generator()
 
     def generate_single(self):
         gen: int = random.randint(0, 1)
-        return gen
+        gender: str = self.genders[gen]
+        name: str = random.choice(self.names[gen])
+        surname: str = random.choice(self.surnames)
+        while True:
+            try:
+                self.year: str = f"{random.randint(1, 30)}/{random.randint(1, 12)}/{random.randint(1900, 2022)}"
+                check = (datetime.now() - datetime.strptime(self.year, '%d/%m/%Y')).days / 365.2425
+                break
+            except ValueError:
+                continue
+        phone = self.generate_phone()
+        id = random.randint(9999, 2000000)
+
+        return Person(name, surname, self.year, gender, phone, id)
 
     def generate_phone(self):
         phone = ""
@@ -63,36 +73,21 @@ class Generator:
             phone += str(random.randint(0, 9))
         return phone
 
-    def generator(self):
-        gender: str = self.genders[self.generate_single()]
-        name: str = random.choice(self.names[self.generate_single()])
-        surname: str = random.choice(self.surnames)
-        while True:
-            try:
-                self.year: str = f"{random.randint(1, 30)}/{random.randint(1, 12)}/{random.randint(1900, 2022)}"
-                check = (datetime.now() - datetime.strptime(self.year, '%d/%m/%Y')).days / 365.2425
-                break
-            except ValueError:
-                continue
-        phone = self.generate_phone()
-        id = random.randint(9999, 20000000)
-        return Person(name, surname, self.year, gender, phone, id)
-
     def generate_1000(self) -> list:
         plist = list()
         for i in range(1000):
-            plist.append(self.generator())
+            plist.append(self.generate_single())
         return plist
 
     def generate_10000(self) -> list:
         plist = list()
-        [plist.append(self.generator()) for i in range(10000)]
+        [plist.append(self.generate_single()) for i in range(10000)]
         return plist
 
 
 if __name__ == '__main__':
     g = Generator()
-    g.generate_1000()
-    g.generate_10000()
+    g.generate_single()
+
 
 
