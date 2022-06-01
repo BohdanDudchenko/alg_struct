@@ -89,8 +89,10 @@ class Generator:
         [plist.append(self.generator()) for i in range(10000)]
         return plist
 
+
 if __name__ == '__main__':
-    for i in range(100000):
-        g = Generator()
+    g = Generator()
+    g.generate_1000()
+    g.generate_10000()
 
 
