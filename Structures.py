@@ -1,103 +1,139 @@
-from AbstractLimitStructure import AbstractStack
-from AbstractLimitStructure import AbstractQueue
-from node import Node
+from AbstractModule import AbstractStructure
 from main import Generator, Person
 
 
-class Stack(AbstractStack):
-    __node = Node(None)
-    __head = __node
-    __cur_top = __head
+class List(AbstractStructure):
+    __list = []
+    size = 0
 
-    def push(self, value: Person) -> bool:
-        head = self.__head
-        top = self.__head.n
-        new_el = Node(value)
-        head.n = new_el
-        new_el.n = top
-        self.__cur_top = head.n
+    def add(self, value: Person, index: int = None) -> bool:
+        if value is not None and index is None:
+            self.__list.append(value)
+            self.size = len(self.__list)
+            return True
 
-        return True
+    def insert(self, value: Person, index: int) -> bool:
+        if index not in range(len(self.__list)):
+            return False
+        else:
+            self.__list[index] = value
+            return True
 
-    def pop(self) -> [Person, None]:
-        if self.__head.n is not None:
-            head = self.__head
-            top = head.n
-            new_top = top.n
-            head.n = new_top
-            self.__cur_top = new_top
-            return top.data
+    def remove(self, value: Person) -> bool:
+        if value in self.__list:
+            self.__list.remove(value)
+            self.size = len(self.__list)
+            return True
+        else:
+            return False
+
+    def get_all(self) -> list:
+        return self.__list
+
+    def get(self, index: int) -> object:
+        if index in range(len(self.__list)):
+            return self.__list[index]
         else:
             return None
 
-    def top(self) -> [Person, None]:
-        if self.__cur_top is not None:
-            return self.__cur_top.data
+    def find(self, value: Person) -> [int, None]:
+        if value in self.__list:
+            return self.__list.index(value)
         else:
             return None
 
+    def __repr__(self):
+        return f"{self.__list}"
 
-class Queue(AbstractQueue):
-    __body = []
-    __size = 0
 
-    def enqueue(self, value: Person) -> bool:
-        self.__body.append(value)
-        self.__size += 1
-        return True
+class DynamiqueArray(AbstractStructure):
+    __array: list = [None]
+    __size: int = 1
+    length: int = 0
 
-    def dequeue(self) -> [Person, None]:
-        if self.__size != 0:
-            value = self.__body[0]
-            self.__body.remove(value)
-            self.__size -= 1
-            return value
+    def __memory_check(self) -> bool:
+        if self.length == self.__size:
+            self.__size *= 2
+            new_array = [None] * self.__size
+            for key, el in enumerate(self.__array):
+                new_array[key] = el
+            self.__array = new_array
+            return True
+        else:
+            return False
+
+    def add(self, value: Person, __index: int = 0) -> bool:
+        self.__memory_check()
+        if self.length == 0:
+            self.__array[0] = value
+            self.length += 1
+            return True
+        else:
+            for i in range(self.length):
+                if self.__array[i + 1]:
+                    self.__array[i + 1] = value
+                    self.length += 1
+                    return True
+                elif value:
+                    pos = self.length
+                    __index = i
+                    while pos != __index:
+                        self.__array[pos] = self.__array[pos - 1]
+                        pos -= 1
+                    self.__array[i] = value
+                    self.length += 1
+                    return True
+        return False
+
+    def insert(self, value: Person, index: int) -> bool:
+        if index in range(self.length):
+            self.__array[index] = value
+            return True
+        else:
+            return False
+
+    def remove(self, value: Person) -> bool:
+        self.__memory_check()
+        if value in self.__array:
+            pos = 0
+            deletion = False
+            while pos < self.length:
+                if value == self.__array[pos]:
+                    deletion = True
+                if deletion is True:
+                    self.__array[pos] = self.__array[pos + 1]
+                pos += 1
+            self.length -= 1
+            return True
+        else:
+            return False
+
+    def get(self, index: int) -> object:
+        if index in range(self.length):
+            return self.__array[index]
         else:
             return None
 
-    def top(self) -> [Person, None]:
-        if self.__size != 0:
-            return self.__body[0]
+    def get_all(self) -> list:
+        list = []
+        for num in range(self.length):
+            list.append(self.__array[num])
+        return list
+
+    def find(self, value) -> [int, None]:
+        if value in self.__array:
+            for pos in range(self.length):
+                if value == self.__array[pos]:
+                    return pos
         else:
             return None
 
+    @property
+    def array(self) -> list:
+        return self.__array
 
-s = Stack()
-q = Queue()
-g = Generator()
-
-print("------------Stack------------")
-s.push(g.generate_single())
-s.push(g.generate_single())
-s.push(g.generate_single())
-s.push(g.generate_single())
-s.push(g.generate_single())
-
-print(f"top : {s.top()}")
-
-print(s.pop())
-print(s.pop())
-print(s.pop())
-print(s.pop())
-print(s.pop())
-print(s.pop())
-
-print(f"top : {s.top()}")
-
-print("------------QUEUE------------")
-q.enqueue(g.generate_single())
-q.enqueue(g.generate_single())
-q.enqueue(g.generate_single())
-q.enqueue(g.generate_single())
-q.enqueue(g.generate_single())
-
-print(f"top : {q.top()}")
-
-print(q.dequeue())
-print(q.dequeue())
-print(q.dequeue())
-print(q.dequeue())
-print(q.dequeue())
-print(q.dequeue())
-
-print(f"top : {q.top()}")
+    def __repr__(self):
+        list = []
+        for num in range(self.length):
+            list.append(self.__array[num])
+        return f"{list}"
