@@ -26,3 +26,4 @@ class AbstractStructure(ABC):
     @abstractmethod
     def get_all(self) -> list:
         ...
+
