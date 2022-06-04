@@ -11,6 +11,12 @@ class List(AbstractStructure):
             self.__list.append(value)
             self.size = len(self.__list)
             return True
+        elif value is not None and index in range(len(self.__list)):
+            self.__list.insert(index, value)
+            self.size = len(self.__list)
+            return True
+        else:
+            return False
 
     def insert(self, value: Person, index: int) -> bool:
         if index not in range(len(self.__list)):
@@ -26,6 +32,10 @@ class List(AbstractStructure):
             return True
         else:
             return False
+
+    def sort(self) -> bool:
+        self.__list.sort()
+        return True
 
     def get_all(self) -> list:
         return self.__list
@@ -62,28 +72,22 @@ class DynamiqueArray(AbstractStructure):
         else:
             return False
 
-    def add(self, value: Person, __index: int = 0) -> bool:
+    def add(self, value: Person, index: int = None) -> bool:
         self.__memory_check()
-        if self.length == 0:
-            self.__array[0] = value
+        if index is None:
+            self.__array[self.length] = value
+            self.length += 1
+            return True
+        elif index in range(self.length):
+            pos = self.length - 1
+            while pos >= index:
+                self.__array[pos + 1] = self.__array[pos]
+                pos -= 1
+            self.__array[index] = value
             self.length += 1
             return True
         else:
-            for i in range(self.length):
-                if self.__array[i + 1]:
-                    self.__array[i + 1] = value
-                    self.length += 1
-                    return True
-                elif value:
-                    pos = self.length
-                    __index = i
-                    while pos != __index:
-                        self.__array[pos] = self.__array[pos - 1]
-                        pos -= 1
-                    self.__array[i] = value
-                    self.length += 1
-                    return True
-        return False
+            return False
 
     def insert(self, value: Person, index: int) -> bool:
         if index in range(self.length):
@@ -129,7 +133,7 @@ class DynamiqueArray(AbstractStructure):
             return None
 
     @property
-    def array(self) -> list:
+    def array(self):
         return self.__array
 
     def __repr__(self):
